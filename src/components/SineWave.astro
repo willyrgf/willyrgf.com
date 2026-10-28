@@ -1,0 +1,52 @@
+---
+import { wavePoints } from '../lib/wave';
+---
+
+<sine-wave>
+  <label>
+    <span>Frequency <output>1.0 Hz</output></span>
+    <input type="range" min="0.5" max="3" step="0.1" value="1" />
+  </label>
+  <svg viewBox="0 0 600 200" role="img" aria-label="Sine wave over two seconds">
+    <path d="M36 30 V190 M36 110 H564" class="axis" />
+    <polyline points={wavePoints(1)} fill="none" stroke="currentColor" stroke-width="2.5" />
+  </svg>
+  <div class="axis-labels" aria-hidden="true"><span>0 s</span><span>1 s</span><span>2 s</span></div>
+  <noscript>Enable JavaScript to adjust the frequency. The graph shows 1 Hz.</noscript>
+</sine-wave>
+
+<script>
+  import { wavePoints } from '../lib/wave';
+
+  class SineWave extends HTMLElement {
+    connectedCallback() {
+      const input = this.querySelector('input')!;
+      const output = this.querySelector('output')!;
+      const curve = this.querySelector('polyline')!;
+      const graph = this.querySelector('svg')!;
+
+      const update = () => {
+        const frequency = Number(input.value);
+        output.value = `${frequency.toFixed(1)} Hz`;
+        curve.setAttribute('points', wavePoints(frequency));
+        graph.setAttribute('aria-label', `Sine wave at ${frequency.toFixed(1)} hertz over two seconds`);
+      };
+
+      input.addEventListener('input', update);
+      update();
+    }
+  }
+
+  customElements.define('sine-wave', SineWave);
+</script>
+
+<style>
+  sine-wave { display: block; margin: 2rem 0; padding: 1.25rem; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; color: var(--accent); }
+  label { display: block; font: 0.85rem var(--font-mono); color: var(--text); }
+  label span { display: flex; justify-content: space-between; gap: 1rem; }
+  output { font-variant-numeric: tabular-nums; }
+  input { display: block; width: 100%; margin: 1rem 0; accent-color: var(--accent); }
+  svg { display: block; width: 100%; }
+  .axis { fill: none; stroke: var(--border); stroke-width: 1; }
+  .axis-labels { display: flex; justify-content: space-between; padding: 0 6%; color: var(--muted); font: 0.8rem var(--font-mono); }
+</style>
