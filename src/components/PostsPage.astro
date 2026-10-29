@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import { getPosts, localizePost } from '../lib/posts';
+import { getMessages, languageTags, localizedPath, type Locale } from '../i18n';
+
+interface Props { locale: Locale }
+
+const { locale } = Astro.props;
+const posts = await getPosts();
+const ui = getMessages(locale);
+const dateFormat = new Intl.DateTimeFormat(languageTags[locale], {
+  year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
+});
+---
+
+<Base locale={locale}>
+  <section aria-label={ui.posts}>
+    <ul class="post-list">
+      {posts.map((post) => {
+        const { entry, contentLocale } = localizePost(post, locale);
+        return (
+          <li>
+            <time datetime={post.english.data.date.toISOString()}>{dateFormat.format(post.english.data.date)}</time>
+            {locale !== contentLocale && <span class="post-language">{ui.englishOnly}</span>}
+            <h2 lang={languageTags[contentLocale]}><a href={localizedPath(locale, `posts/${post.slug}`)}>{entry.data.title}</a></h2>
+            <p lang={languageTags[contentLocale]}>{entry.data.description}</p>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+</Base>

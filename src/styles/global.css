@@ -73,6 +73,8 @@ time, .post-header p, .post-list p { color: var(--muted); }
 .post-list li + li { border-top: 1px solid var(--border); }
 .post-list h2 { margin: 0.4rem 0; font-size: 1.3rem; }
 .post-list p { margin: 0; }
+.post-language { margin-left: 0.75rem; font-size: 0.8rem; color: var(--muted); }
+.translation-notice { padding: 0.75rem 1rem; background: var(--panel); color: var(--text); font-size: 0.85rem; }
 .post-header { padding: 3rem 0 1rem; }
 .post-header h1 { margin: 0.6rem 0; }
 .prose { overflow-wrap: break-word; }

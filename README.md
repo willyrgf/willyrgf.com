@@ -16,6 +16,8 @@ Their license is included in `public/fonts/Hack-LICENSE.txt`.
 ## Site settings
 
 Edit `src/site.config.ts` to change the site title, description, or production URL.
+The blog title is shared across all languages. `description.en` and
+`description['pt-br']` contain the English and Brazilian Portuguese descriptions.
 The layout and Astro build config share these settings, including
 page titles, default metadata, and canonical URLs.
 Individual posts keep their own titles and descriptions in frontmatter.
@@ -23,6 +25,9 @@ Individual posts keep their own titles and descriptions in frontmatter.
 Edit `src/pages/about.md` to update the About page and its contact links. It uses
 `src/layouts/Markdown.astro` and contains a copy of the
 [GitHub profile README](https://github.com/willyrgf/willyrgf/blob/master/README.md).
+Its Portuguese version is `src/pages/pt-br/about.md`.
+Both About pages use `showSiteDescription: true` in their frontmatter to display
+the description for their language directly from the shared config.
 
 ## Develop
 
@@ -54,6 +59,7 @@ Open the local URL printed by Astro. The blog is served at `/`.
 
 ```sh
 npm run check    # Check Astro and TypeScript
+npm test         # Check language matching and locale URLs
 npm run build    # Generate static HTML and assets in dist/
 npm run preview  # Serve the production build locally
 ```
@@ -72,23 +78,79 @@ date: 2026-10-28
 Write your post here.
 ```
 
-The filename becomes its URL: `my-next-post.md` → `/posts/my-next-post/`.
-The homepage lists posts newest first. All posts
-in this directory are published; remove the two example posts when ready.
+The filename becomes its English URL: `my-next-post.md` → `/posts/my-next-post/`.
+The homepage lists posts newest first. All posts in this directory are published.
 
-For an interactive post, use `.mdx` and import a component:
+### Languages and translations
+
+English posts stay directly in `src/content/posts/`. Add a Brazilian Portuguese
+translation with the same filename under `src/content/posts/pt-br/`:
+
+```text
+src/content/posts/my-next-post.md        → /posts/my-next-post/
+src/content/posts/pt-br/my-next-post.md  → /pt-br/posts/my-next-post/
+```
+
+Translate the full body, `title`, and `description`; keep the original `date`.
+Translations support both Markdown and MDX. A translation must have an English
+original with the same filename (the extension may differ).
+Relative MDX component imports need an extra `../` inside the `pt-br` directory.
+
+The Portuguese homepage lists every English post once, using translated titles
+and descriptions when available. A missing translation displays the complete
+English post at its Portuguese URL with a short notice. Its article is marked
+as English, and its canonical URL points to the English original.
+
+The site uses the browser's preferred supported language on visits to English
+URLs. Portuguese browser languages (including `pt` and regional variants) use
+pt-BR; unsupported languages fall back to English. The header's `EN` / `PT-BR`
+link switches the current page and remembers the explicit choice in local storage.
+An explicit `/pt-br/` URL always opens in Portuguese. With JavaScript disabled
+or browser storage blocked, the language links still work without automatic
+selection. Language redirects preserve query strings and fragment links.
+
+Astro builds both languages as static HTML for GitHub Pages. UI translations
+and language helpers live in `src/i18n.ts`; site branding stays in
+`src/site.config.ts`. Adding a translation requires a rebuild and deployment.
+
+For an interactive post, use `.mdx` (Markdown with components) and import a
+component. Keep its labels and explanatory text in the post itself:
 
 ```mdx
 import SineWave from '../../components/SineWave.astro';
 
 Try changing the frequency:
 
-<SineWave />
+<SineWave
+  lang="en"
+  frequencyLabel="Frequency"
+  graphLabel="Sine wave at {frequency} hertz over two seconds"
+  noScript="Enable JavaScript to adjust the frequency. The graph shows 1 Hz."
+/>
 ```
 
-See `src/content/posts/exploring-a-wave.mdx` and
-`src/components/SineWave.astro` for a complete example. The graph is rendered
-into the static HTML, then its slider is connected in the browser. JavaScript
+The Portuguese version supplies its own copy in its `.mdx` file:
+
+```mdx
+import SineWave from '../../../components/SineWave.astro';
+
+Experimente mudar a frequência:
+
+<SineWave
+  lang="pt-BR"
+  frequencyLabel="Frequência"
+  graphLabel="Onda senoidal a {frequency} hertz ao longo de dois segundos"
+  noScript="Ative o JavaScript para ajustar a frequência. O gráfico mostra 1 Hz."
+/>
+```
+
+All four props are required. The `{frequency}` placeholder in `graphLabel` is
+replaced with the current frequency, formatted using `lang`. Each translation
+owns its component's text and language; an English fallback keeps English labels
+and number formatting. Shared `src/i18n.ts` messages are for site-wide UI.
+
+See `src/components/SineWave.astro` for a complete example. The graph is rendered
+into the static HTML, then its slider is connected in the browser. The graph's JavaScript
 is bundled only into pages that use the component.
 
 Place static downloads and images in `public/`. Link to them from the root:
