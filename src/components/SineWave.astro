@@ -1,18 +1,29 @@
 ---
 import { wavePoints } from '../lib/wave';
+interface Props {
+  lang: string;
+  frequencyLabel: string;
+  graphLabel: string;
+  noScript: string;
+}
+
+const { lang, frequencyLabel, graphLabel, noScript } = Astro.props;
+const initialFrequency = new Intl.NumberFormat(lang, {
+  minimumFractionDigits: 1, maximumFractionDigits: 1,
+}).format(1);
 ---
 
-<sine-wave>
+<sine-wave lang={lang} data-graph-label={graphLabel}>
   <label>
-    <span>Frequency <output>1.0 Hz</output></span>
+    <span>{frequencyLabel} <output>{initialFrequency} Hz</output></span>
     <input type="range" min="0.5" max="3" step="0.1" value="1" />
   </label>
-  <svg viewBox="0 0 600 200" role="img" aria-label="Sine wave over two seconds">
+  <svg viewBox="0 0 600 200" role="img" aria-label={graphLabel.replace('{frequency}', initialFrequency)}>
     <path d="M36 30 V190 M36 110 H564" class="axis" />
     <polyline points={wavePoints(1)} fill="none" stroke="currentColor" stroke-width="2.5" />
   </svg>
   <div class="axis-labels" aria-hidden="true"><span>0 s</span><span>1 s</span><span>2 s</span></div>
-  <noscript>Enable JavaScript to adjust the frequency. The graph shows 1 Hz.</noscript>
+  <noscript>{noScript}</noscript>
 </sine-wave>
 
 <script>
@@ -24,12 +35,16 @@ import { wavePoints } from '../lib/wave';
       const output = this.querySelector('output')!;
       const curve = this.querySelector('polyline')!;
       const graph = this.querySelector('svg')!;
+      const numberFormat = new Intl.NumberFormat(this.lang, {
+        minimumFractionDigits: 1, maximumFractionDigits: 1,
+      });
 
       const update = () => {
         const frequency = Number(input.value);
-        output.value = `${frequency.toFixed(1)} Hz`;
+        const formatted = numberFormat.format(frequency);
+        output.value = `${formatted} Hz`;
         curve.setAttribute('points', wavePoints(frequency));
-        graph.setAttribute('aria-label', `Sine wave at ${frequency.toFixed(1)} hertz over two seconds`);
+        graph.setAttribute('aria-label', this.dataset.graphLabel!.replace('{frequency}', formatted));
       };
 
       input.addEventListener('input', update);

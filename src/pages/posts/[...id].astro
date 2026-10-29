@@ -1,31 +1,12 @@
 ---
-import { getCollection, render, type CollectionEntry } from 'astro:content';
-import Base from '../../layouts/Base.astro';
+import PostPage from '../../components/PostPage.astro';
+import { getPostPaths, type PostPageProps } from '../../lib/posts';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
-  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+  return getPostPaths('en');
 }
 
-interface Props {
-  post: CollectionEntry<'posts'>;
-}
-
-const { post } = Astro.props;
-const { Content } = await render(post);
-const date = new Intl.DateTimeFormat('en', {
-  year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
-}).format(post.data.date);
+type Props = PostPageProps;
 ---
 
-<Base title={post.data.title} description={post.data.description}>
-  <article>
-    <header class="post-header">
-      <time datetime={post.data.date.toISOString()}>{date}</time>
-      <h1>{post.data.title}</h1>
-      <p>{post.data.description}</p>
-    </header>
-    <div class="prose"><Content /></div>
-  </article>
-  <p class="back-link"><a href={import.meta.env.BASE_URL}>← All posts</a></p>
-</Base>
+<PostPage {...Astro.props} />

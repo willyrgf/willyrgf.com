@@ -1,0 +1,12 @@
+---
+import PostPage from '../../../components/PostPage.astro';
+import { getPostPaths, type PostPageProps } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  return getPostPaths('pt-br');
+}
+
+type Props = PostPageProps;
+---
+
+<PostPage {...Astro.props} />

@@ -1,6 +1,7 @@
 ---
 layout: ../layouts/Markdown.astro
 title: About
+showSiteDescription: true
 ---
 
 # ⊂me

@@ -1,42 +1,69 @@
 ---
 import '../styles/global.css';
 import hackFont from '../assets/fonts/hack-nerd-regular.woff2?url';
+import { getMessages, languageTags, locales, localizedPath, resolveLocale, unlocalizedPath, type Locale } from '../i18n';
 import { siteConfig } from '../site.config';
 
 interface Props {
   title?: string;
   description?: string;
+  locale?: Locale;
+  canonicalPath?: string;
+  availableLocales?: readonly Locale[];
 }
 
 const {
   title,
-  description = siteConfig.description,
+  description,
+  locale: requestedLocale,
+  canonicalPath,
+  availableLocales = locales,
 } = Astro.props;
+const locale = resolveLocale(requestedLocale ?? Astro.currentLocale);
+const ui = getMessages(locale);
 const pageTitle = title ? `${title} · ${siteConfig.title}` : siteConfig.title;
-const canonical = new URL(Astro.url.pathname, Astro.site);
-const aboutUrl = `${import.meta.env.BASE_URL}about/`;
+const canonical = new URL(canonicalPath ?? Astro.url.pathname, Astro.site);
+const pagePath = unlocalizedPath(Astro.url.pathname);
+const otherLocale = locale === 'en' ? 'pt-br' : 'en';
+const aboutUrl = localizedPath(locale, 'about');
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={languageTags[locale]} data-locale={locale} data-portuguese-url={localizedPath('pt-br', pagePath)}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta name="description" content={description} />
+    <meta name="description" content={description ?? siteConfig.description[locale]} />
     <link rel="canonical" href={canonical} />
+    {availableLocales.map((language) => (
+      <link rel="alternate" hreflang={languageTags[language]} href={new URL(localizedPath(language, pagePath), Astro.site)} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={new URL(localizedPath('en', pagePath), Astro.site)} />
     <link rel="preload" href={hackFont} as="font" type="font/woff2" crossorigin />
     <title>{pageTitle}</title>
+    <script>
+      import '../scripts/language';
+    </script>
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">{ui.skipToContent}</a>
     <header class="site-header">
-      <a class="site-name" href={import.meta.env.BASE_URL}>{siteConfig.title}</a>
-      <nav class="site-nav" aria-label="Main navigation">
-        <a href={aboutUrl} aria-current={Astro.url.pathname === aboutUrl ? 'page' : undefined}>About</a>
+      <a class="site-name" href={localizedPath(locale)} lang="en">{siteConfig.title}</a>
+      <nav class="site-nav" aria-label={ui.navigation}>
+        <a href={aboutUrl} aria-current={Astro.url.pathname === aboutUrl ? 'page' : undefined}>{ui.about}</a>
+        <a href={localizedPath(otherLocale, pagePath)} lang={languageTags[otherLocale]} hreflang={languageTags[otherLocale]} data-language={otherLocale} aria-label={ui.switchLanguage}>{otherLocale === 'en' ? 'EN' : 'PT-BR'}</a>
       </nav>
     </header>
     <main id="main">
       <slot />
     </main>
+    {import.meta.env.PROD && (
+      <script
+        is:inline
+        data-goatcounter="https://willyrgf.goatcounter.com/count"
+        async
+        src="https://gc.zgo.at/count.js"
+      ></script>
+    )}
   </body>
 </html>

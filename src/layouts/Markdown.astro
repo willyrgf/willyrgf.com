@@ -1,12 +1,23 @@
 ---
 import type { MarkdownLayoutProps } from 'astro';
 import Base from './Base.astro';
+import { resolveLocale, type Locale } from '../i18n';
+import { siteConfig } from '../site.config';
 
-type Props = MarkdownLayoutProps<{ title: string; description?: string }>;
+type Props = MarkdownLayoutProps<{
+  title: string;
+  description?: string;
+  locale?: Locale;
+  showSiteDescription?: boolean;
+}>;
 
-const { title, description } = Astro.props.frontmatter;
+const { title, description, locale: requestedLocale, showSiteDescription = false } = Astro.props.frontmatter;
+const locale = resolveLocale(requestedLocale ?? Astro.currentLocale);
 ---
 
-<Base title={title} description={description}>
-  <article class="prose"><slot /></article>
+<Base title={title} description={description} locale={locale}>
+  <article class="prose">
+    {showSiteDescription && <p>{siteConfig.description[locale]}</p>}
+    <slot />
+  </article>
 </Base>
