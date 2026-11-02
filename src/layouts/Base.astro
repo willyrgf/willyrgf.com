@@ -26,6 +26,7 @@ const canonical = new URL(canonicalPath ?? Astro.url.pathname, Astro.site);
 const pagePath = unlocalizedPath(Astro.url.pathname);
 const otherLocale = locale === 'en' ? 'pt-br' : 'en';
 const aboutUrl = localizedPath(locale, 'about');
+const rssPath = `${localizedPath(locale)}rss.xml`;
 ---
 
 <!doctype html>
@@ -35,6 +36,7 @@ const aboutUrl = localizedPath(locale, 'about');
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description ?? siteConfig.description[locale]} />
     <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.title} · ${ui.rssFeed}`} href={new URL(rssPath, Astro.site)} />
     {availableLocales.map((language) => (
       <link rel="alternate" hreflang={languageTags[language]} href={new URL(localizedPath(language, pagePath), Astro.site)} />
     ))}
@@ -51,6 +53,7 @@ const aboutUrl = localizedPath(locale, 'about');
       <a class="site-name" href={localizedPath(locale)} lang="en">{siteConfig.title}</a>
       <nav class="site-nav" aria-label={ui.navigation}>
         <a href={aboutUrl} aria-current={Astro.url.pathname === aboutUrl ? 'page' : undefined}>{ui.about}</a>
+        <a href={rssPath} aria-label={ui.rssFeed}>RSS</a>
         <a href={localizedPath(otherLocale, pagePath)} lang={languageTags[otherLocale]} hreflang={languageTags[otherLocale]} data-language={otherLocale} aria-label={ui.switchLanguage}>{otherLocale === 'en' ? 'EN' : 'PT-BR'}</a>
       </nav>
     </header>

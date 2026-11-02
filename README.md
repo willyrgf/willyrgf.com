@@ -156,6 +156,18 @@ is bundled only into pages that use the component.
 Place static downloads and images in `public/`. Link to them from the root:
 `public/images/figure.svg` becomes `/images/figure.svg`.
 
+## RSS
+
+Subscribe at `/rss.xml` for English or `/pt-br/rss.xml` for Brazilian Portuguese.
+Every page includes an RSS link and feed discovery metadata for its language.
+The feeds are generated during the normal build and deployed with the site.
+
+Each feed lists posts newest first with their title, description, original
+publication date, and a permanent link. Like the Portuguese homepage, the
+Portuguese feed uses English text when a translation is missing. Post links stay
+the same when a translation is added, so the feed item keeps its identity.
+Full articles and interactive elements are available on the linked post pages.
+
 ## Publish with GitHub Pages
 
 1. In this repository on GitHub, select **Settings → Pages → Source → GitHub Actions**.

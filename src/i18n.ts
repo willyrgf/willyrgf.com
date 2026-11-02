@@ -7,6 +7,7 @@ const messages = {
   en: {
     navigation: 'Main navigation',
     about: 'About',
+    rssFeed: 'Subscribe via RSS',
     posts: 'Posts',
     skipToContent: 'Skip to content',
     allPosts: '← All posts',
@@ -17,6 +18,7 @@ const messages = {
   'pt-br': {
     navigation: 'Navegação principal',
     about: 'Sobre',
+    rssFeed: 'Assinar via RSS',
     posts: 'Publicações',
     skipToContent: 'Pular para o conteúdo',
     allPosts: '← Todos os textos',
